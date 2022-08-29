@@ -73,11 +73,15 @@ export class SlackHandler {
     event,
     say,
   }: SlackEventMiddlewareArgs<"app_mention">) {
-    const sendReply = (text: string) =>
-      say({
+    const sendReply = (text: string) => {
+      if (text.length > 3000) {
+        text = "Output truncated.\n" + text.slice(0, 3000);
+      }
+      return say({
         text,
         thread_ts: event.thread_ts,
       });
+    }
 
     const langCode = event.text
       .split(/ +/)[1]
