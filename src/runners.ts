@@ -11,6 +11,7 @@ export const docker = new Docker({ socketPath });
 const images = {
   [Language.Python]: "python:3.10-alpine",
   [Language.JavaScript]: "node:18-alpine",
+  [Language.Kotlin]: "jun2620354/kotlinc:1.7.10"
 };
 
 export async function pullImages() {
@@ -78,6 +79,14 @@ async function runJavaScriptCode(code: string, sendReply: SendReply) {
   );
 }
 
+async function runKotlinCode(code: string, sendReply: SendReply) {
+  return runCodeInContainer(
+    Language.Kotlin,
+    ["-e", code],
+    sendReply
+  );
+}
+
 export async function run(
   language: Language,
   code: string,
@@ -88,5 +97,7 @@ export async function run(
       return runPythonCode(code, sendReply);
     case Language.JavaScript:
       return runJavaScriptCode(code, sendReply);
+    case Language.Kotlin:
+      return runKotlinCode(code, sendReply);
   }
 }
