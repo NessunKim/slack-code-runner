@@ -11,7 +11,7 @@ export const docker = new Docker({ socketPath });
 const images = {
   [Language.Python]: "python:3.10-alpine",
   [Language.JavaScript]: "node:18-alpine",
-  [Language.Kotlin]: "jun2620354/kotlinc:1.7.10"
+  [Language.Kotlin]: "jun2620354/kotlinc:1.7.10",
 };
 
 export async function pullImages() {
@@ -22,7 +22,8 @@ export async function pullImages() {
 async function runCodeInContainer(
   language: Language,
   cmd: string[],
-  sendReply: SendReply
+  sendReply: SendReply,
+  timeout = 3000
 ) {
   let container: Container | undefined;
 
@@ -33,7 +34,7 @@ async function runCodeInContainer(
       StopTimeout: 1,
       Tty: true,
     });
-    const timeout = setTimeout(() => {
+    const timer = setTimeout(() => {
       try {
         if (container) {
           sendReply("Container timed out.");
@@ -42,7 +43,7 @@ async function runCodeInContainer(
       } catch (e) {
         logger.error(e);
       }
-    }, 3000);
+    }, timeout);
     await container.start();
     const stream = await container.logs({
       follow: true,
@@ -58,7 +59,7 @@ async function runCodeInContainer(
         resolve(output);
       });
     });
-    clearTimeout(timeout);
+    clearTimeout(timer);
     return output.trim();
   } finally {
     if (container) {
@@ -80,11 +81,7 @@ async function runJavaScriptCode(code: string, sendReply: SendReply) {
 }
 
 async function runKotlinCode(code: string, sendReply: SendReply) {
-  return runCodeInContainer(
-    Language.Kotlin,
-    ["-e", code],
-    sendReply
-  );
+  return runCodeInContainer(Language.Kotlin, ["-e", code], sendReply, 7000);
 }
 
 export async function run(
