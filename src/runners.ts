@@ -82,7 +82,7 @@ async function runJavaScriptCode(code: string, sendReply: SendReply) {
 }
 
 async function runKotlinCode(code: string, sendReply: SendReply) {
-  return runCodeInContainer(Language.Kotlin, ["-e", code], sendReply, 7000);
+  return runCodeInContainer(Language.Kotlin, ["-e", code], sendReply, 20000);
 }
 
 export async function run(
