@@ -60,7 +60,8 @@ async function runCodeInContainer(
       });
     });
     clearTimeout(timer);
-    return output.trim();
+    // eslint-disable-next-line no-control-regex
+    return output.replace(/\x1b\[\d+m/g, "").trim();
   } finally {
     if (container) {
       await container.remove({ force: true });
