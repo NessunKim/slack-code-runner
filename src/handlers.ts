@@ -44,6 +44,10 @@ function handleEvent(eventType: string): MethodDecorator {
     Reflect.defineMetadata("events", events, target);
   };
 }
+
+const unescape = (text: string) =>
+  text.replaceAll("&lt;", "<").replaceAll("&gt;", ">").replaceAll("&amp;", "&");
+
 const usageExample = '@Code Runner py\n```print("Hello World")\n```';
 
 export class SlackHandler {
@@ -105,7 +109,7 @@ export class SlackHandler {
       await sendReply(`Please provide code to run. Usage:\n${usageExample}`);
       return;
     }
-    const result = await run(language, code, sendReply);
+    const result = await run(language, unescape(code), sendReply);
     if (result.length) {
       await sendReply(result);
     } else {
